@@ -5,7 +5,7 @@
 ---
 
 # Project Title
-
+Quantum Minesweeper
 ## Project Metadata
 
 * **Project Title:** Quantum Minesweeper: The Superposition Challenge
@@ -18,7 +18,7 @@
 
 | Name                   | Email              | GitHub Username        |
 | :--------------------- | :----------------- | :--------------------- |
-| [Enter your full name] | [Enter your email] | [@reddyrohiththavalam] |
+| Thavalam reddy rohith | reddyrohiththavalam@gmail.com | [@reddyrohiththavalam] |
 
 ---
 
