@@ -1,16 +1,6 @@
 # Qiskit Fall Fest 2026 — Project Submission Template
+
 **IIIT Kottayam Quantum Hackathon (24-Hour Sprint)**
-
-> ⚠️ **CRITICAL INSTRUCTIONS FOR PARTICIPANTS:**
-> 1. **Do NOT rename or delete the section headings** below. The automated AI evaluation and filtering system relies on this exact Markdown structure to parse and grade your project.
-> 2. Replace all placeholder text enclosed in `[brackets]` with your project's details.
-> 3. **Commit History Audit:** All project commits must be timestamped strictly within the 24-hour hackathon window (between **October 10, 2026 at 7:05 PM** and **October 11, 2026 at 7:05 PM**). Commits observed outside this window will result in **immediate disqualification**.
-> 4. Ensure all Jupyter Notebooks have their cells **run and outputs displayed** before pushing.
-> 5. Starter resources and reference guides are located in the [`references/`](./references/) folder.
-> 6. **Tech Stack Flexibility:** You are free to use any external frameworks/technologies (e.g., Streamlit, React, Pygame, FastAPI, NetworkX) for your frontend, app logic, or classical baselines. However, **Qiskit MUST power the quantum core** of your project.
-> 7. **Full Event Guide & Rules:** For full schedule details, track inspirations, submission steps, and grading focus areas, refer to [`HACKATHON_GUIDE.md`](./HACKATHON_GUIDE.md).
-
-*(You may delete the instructions box above when preparing your final repository submission)*
 
 ---
 
@@ -18,129 +8,219 @@
 
 ## Project Metadata
 
-* **Project Title:** `[Your Project Title]`
-* **Team Name:** `[Your Team Name]`
-* **Chosen Track:** `[Track 1: Quantum Games & Interactive Puzzles OR Track 2: Open-Domain Optimization & Real-World Solvers]`
-* **Video Presentation Link:** `[Insert YouTube Unlisted / Google Drive / Loom URL here]`
-  *(⚠️ Crucial: Ensure link access is set to "Anyone with the link can view" on Google Drive or "Unlisted / Public" on YouTube. Locked/inaccessible links cannot be scored!)*
-* **Live Demo Timestamp in Video:** `[MM:SS]` *(e.g., "Demo starts at 03:45")*
+* **Project Title:** Quantum Minesweeper: The Superposition Challenge
+* **Team Name:** Quantum Minesweepers
+* **Chosen Track:** Track 1: Quantum Games & Interactive Puzzles
+* **Video Presentation Link:** To be added after recording the final presentation.
+* **Live Demo Timestamp in Video:** To be added after recording.
 
 ### Team Members (Max 4 members)
-| Name | Email | GitHub Username |
-| :--- | :--- | :--- |
-| `[Member 1 Name]` | `[Email]` | `[@username]` |
-| `[Member 2 Name]` | `[Email]` | `[@username]` |
-| `[Member 3 Name]` | `[Email]` | `[@username]` |
-| `[Member 4 Name]` | `[Email]` | `[@username]` |
+
+| Name                   | Email              | GitHub Username        |
+| :--------------------- | :----------------- | :--------------------- |
+| [Enter your full name] | [Enter your email] | [@reddyrohiththavalam] |
 
 ---
 
 ## 1. Project Overview & Motivation
 
-* **Summary (3–4 sentences):**  
-  `[Provide a concise executive summary of what you built. What is the game or optimization dilemma?]`
+* **Summary (3–4 sentences):**
 
-* **Why this problem / game?**  
-  `[Explain why you chose this specific topic. Why is it engaging, practically relevant, or pedagogically meaningful?]`
+  Quantum Minesweeper is an interactive 3×3 Minesweeper-inspired game that uses Qiskit to generate a hidden board through quantum measurement. The game prepares nine qubits, applies probability-controlled rotation gates, and measures each qubit to determine whether its corresponding tile contains a mine. Players reveal tiles and use neighboring mine counts as clues to explore the board. The project combines quantum circuit simulation, classical game logic, and an interactive Streamlit interface to demonstrate how quantum measurement can be used in a simple game.
+
+* **Why this problem / game?**
+
+  Minesweeper is an accessible puzzle that combines uncertainty, logical reasoning, and decision-making. By using a quantum circuit to generate the hidden board, this project provides a practical introduction to qubits, quantum gates, measurement, and probability. The small board makes the game easy to understand while allowing users to inspect the quantum circuit and compare its behavior with a classical random baseline.
 
 ---
 
 ## 2. Quantum Architecture & Mechanics
 
-* **Core Quantum Principles Used:**  
-  `[Specify the exact quantum principles at play: e.g., Superposition (H gate), Entanglement (Bell states / CNOT), Measurement Collapse, Interference, or QAOA Cost Hamiltonian.]`
+* **Core Quantum Principles Used:**
 
-* **How the Quantum Circuit is Integrated:**  
-  `[Explain how quantum states map to your game board, strategy, or optimization problem. How does your Qiskit circuit interact with player input or the optimization loop?]`
+  * **Qubit superposition:** Rotation gates prepare qubits in probabilistic quantum states.
+  * **Quantum measurement:** Measuring each qubit produces a classical bit that determines the corresponding tile.
+  * **Measurement probabilities:** The rotation angle controls the probability of measuring a mine bit.
+  * **Classical post-processing:** The measured bit string is converted into the game board, and ordinary Python logic calculates neighboring mine counts.
 
-* **Circuit Details:**  
-  * **Number of Qubits:** `[e.g., 4 qubits]`
-  * **Key Gates Used:** `[e.g., H, CX, RZ, Measurement]`
-  * **Primitives Used:** `[e.g., StatevectorSampler, StatevectorEstimator, or Qiskit Aer simulator]`
-  * **Other Technologies Used:** `[e.g., Streamlit for UI, NetworkX for graph generation, Pygame, etc. (Note: Qiskit must power the quantum logic)]`
+  This implementation does not use entanglement or claim a quantum computational advantage.
+
+* **How the Quantum Circuit is Integrated:**
+
+  The game uses a 3×3 grid represented by nine qubits. For a selected mine probability \(p\), each qubit is prepared with an RY rotation whose angle is \(\theta = 2\arcsin(\sqrt{p})\). Each qubit is then measured in the computational basis. A measured `1` represents a mine and a measured `0` represents a safe tile.
+
+  The resulting board is stored for the current round. When the player reveals a tile, the application displays the result and calculates the number of neighboring mines using classical Python logic. Creating a new board runs the circuit again to obtain a fresh measured outcome.
+
+* **Circuit Details:**
+
+  * **Number of Qubits:** 9
+  * **Key Gates Used:** RY rotation gates and computational-basis measurements.
+  * **Primitives Used:** Qiskit circuit simulation with Qiskit Aer.
+  * **Other Technologies Used:** Python, Streamlit, NumPy, Matplotlib, and Jupyter Notebook.
+
+Representative circuit preparation:
 
 ```python
-# Optional: Paste a representative snippet of your core Qiskit circuit code here
+from qiskit import QuantumCircuit
+from math import asin, sqrt
+
+n_qubits = 9
+mine_probability = 0.25
+theta = 2 * asin(sqrt(mine_probability))
+
+qc = QuantumCircuit(n_qubits, n_qubits)
+
+for qubit in range(n_qubits):
+    qc.ry(theta, qubit)
+
+qc.measure(range(n_qubits), range(n_qubits))
 ```
+
+The circuit is illustrative of the preparation and measurement approach used in the project. The application and notebook contain the runnable implementation.
 
 ---
 
 ## 3. Repository Structure & How to Run
 
 ### Project Structure
+
 ```text
-├── README.md               # Project documentation (this file)
-├── requirements.txt        # Python dependencies
-├── src/                    # Source code scripts or game application
-│   └── main.py             # Main entry point (or streamlit app)
-├── notebooks/              # Jupyter notebooks containing experiments
-│   └── solution.ipynb      # Main runnable notebook with outputs
-└── references/             # Hackathon reference guides (Track 1 & Track 2)
+quantum-minesweeper-qiskit/
+├── README.md
+├── requirements.txt
+├── HACKATHON_GUIDE.md
+├── src/
+│   └── app.py
+├── notebooks/
+│   └── solution.ipynb
+└── references/
+    └── Track-specific hackathon resources
 ```
 
 ### Installation & Execution Instructions
 
-> 💡 **Environment Recommendation:** To avoid package conflicts, we strongly suggest using a fresh Python virtual environment or Google Colab:
-> ```bash
-> python -m venv venv
-> source venv/bin/activate    # On Windows: venv\Scripts\activate
-> pip install -r requirements.txt
-> ```
+**Requirements:** Python, pip, and the dependencies listed in `requirements.txt`.
 
 1. **Clone the repository:**
-   ```bash
-   git clone [your-repo-url]
-   cd [your-repo-folder]
-   ```
-2. **Install dependencies:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-3. **Run the project / demo:**
-   ```bash
-   # If running a script or CLI game:
-   python src/main.py
 
-   # If running a Streamlit web app:
-   streamlit run src/app.py
-
-   # Or open the Jupyter Notebook:
-   jupyter notebook notebooks/solution.ipynb
+   ```bash
+   git clone https://github.com/reddyrohiththavalam/quantum-minesweeper-qiskit.git
+   cd quantum-minesweeper-qiskit
    ```
+
+2. **Create and activate a virtual environment (recommended):**
+
+   On Windows PowerShell:
+
+   ```powershell
+   python -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   ```
+
+   On macOS/Linux:
+
+   ```bash
+   python -m venv .venv
+   source .venv/bin/activate
+   ```
+
+3. **Install dependencies:**
+
+   ```bash
+   python -m pip install -r requirements.txt
+   python -m pip install streamlit
+   ```
+
+4. **Run the interactive game:**
+
+   ```bash
+   python -m streamlit run src/app.py
+   ```
+
+   Open the local URL displayed in the terminal, usually `http://localhost:8501`.
+
+5. **Run the experiment notebook:**
+
+   ```bash
+   python -m jupyter notebook notebooks/solution.ipynb
+   ```
+
+   The notebook includes circuit preparation, measurement experiments, visualization, a probability check, and a classical comparison.
 
 ---
 
 ## 4. Implementation Walkthrough & Live Demo
 
-* **Walkthrough of Gameplay / Optimization Pipeline:**  
-  `[Describe the user experience or algorithmic workflow step-by-step. What inputs does the user provide, what happens inside the quantum circuit, and what output is produced?]`
+* **Walkthrough of Gameplay / Optimization Pipeline:**
 
-* **Key Screenshots / Terminal Output:**  
-  `[Paste sample terminal output, game screenshots, or optimization convergence plots here to demonstrate that the project runs.]`
+  1. Launch the Streamlit application.
+  2. Choose the desired mine probability using the application controls.
+  3. Generate a new quantum board.
+  4. The application prepares nine qubits, applies rotation gates, and measures the circuit using the quantum simulator.
+  5. The measurement outcomes are mapped to mine and safe tiles.
+  6. Reveal tiles to see their outcomes and the neighboring mine-count clues.
+  7. Start a new board to obtain a new set of measurement outcomes.
+  8. Use the notebook to inspect the circuit, visualize outcomes, and compare measured statistics with a classical random model.
+
+* **Key Screenshots / Terminal Output:**
+
+  Capture and add the following before final submission:
+
+  * A screenshot of the running game before revealing tiles.
+  * A screenshot showing revealed tiles and neighboring mine-count clues.
+  * A screenshot of the quantum circuit or notebook probability plot.
+  * A screenshot of the classical-versus-quantum sampling experiment.
+
+  Screenshots should come from the actual running project and should not be presented as measured results unless the experiment was executed.
 
 ---
 
 ## 5. Classical vs. Quantum Comparison
 
-* **Classical Baseline / Counterpart:**  
-  `[What classical baseline did you compare against? (e.g., a classical player, a random guesser, a brute-force classical solver, or a naive greedy heuristic)]`
+* **Classical Baseline / Counterpart:**
 
-* **Comparative Analysis:**  
-  `[How did the quantum approach compare to the classical baseline? For Track 1: Did quantum strategy give an unfair advantage or unique gameplay behavior? For Track 2: What was the approximation ratio (C_quantum / C_optimal) and feasibility yield?]`
+  The classical baseline is an independent random-board model in which each tile is assigned a mine with probability \(p\). For a fair comparison, the classical model uses the same board size and mine probability as the quantum circuit. The notebook compares observed mine frequencies from quantum-circuit simulation with frequencies from classical Bernoulli sampling.
+
+* **Comparative Analysis:**
+
+  For each qubit, the rotation angle is chosen so that the probability of measuring `1` is \(p\). With the same probability and independent qubit preparation, the ideal quantum measurement distribution for this circuit matches the corresponding classical independent Bernoulli model.
+
+  The quantum implementation demonstrates how a circuit can generate the board, but it does not establish a speedup or a gameplay advantage over classical sampling. The main contribution is educational: players can explore a familiar puzzle while examining the quantum preparation and measurement process.
 
 ---
 
 ## 6. Performance, Results & Limitations
 
-* **Key Results & Observations:**  
-  `[Summarize the main results from your experiments, simulations, or gameplay tests.]`
+* **Key Results & Observations:**
 
-* **Critical Reflection on Limitations:**  
-  `[Be honest and rigorous: What happens if this is scaled to larger qubit counts? How would physical quantum noise, gate errors, and decoherence affect your solution on real NISQ hardware? Acknowledging limitations demonstrates true scientific understanding!]`
+  * The game represents a 3×3 board using nine qubits.
+  * The mine probability is controlled through rotation-gate parameters.
+  * Circuit measurement outcomes are converted into a playable grid.
+  * Classical logic calculates neighboring mine counts.
+  * The notebook executes circuit experiments, displays outputs, visualizes results, and compares quantum-simulator statistics with classical sampling.
+
+  The notebook's finite-shot results are statistical samples; observed frequencies can differ from the selected probability due to sampling variation. Exact numerical conclusions should be reported from the saved experiment outputs rather than assumed in advance.
+
+* **Critical Reflection on Limitations:**
+
+  * The game uses a small nine-qubit board and does not demonstrate quantum advantage.
+  * The circuit prepares independent qubits; it does not use entanglement or interference to solve the puzzle.
+  * Qiskit Aer simulation runs on classical computing hardware and is not evidence of execution on a physical quantum processor.
+  * Finite measurement shots introduce statistical variation.
+  * Larger boards require more qubits, additional circuit resources, and more complex user-interface logic.
+  * On real quantum hardware, gate errors, readout errors, decoherence, and other noise can affect the measured board.
+  * The game logic and neighboring mine-count calculations are classical.
+  * The current project is an educational prototype, not a quantum-accelerated Minesweeper solver.
 
 ---
 
 ## 7. References & Acknowledgments
 
-* `[Cite any open-source libraries, GitHub repositories, or research papers you referenced during the hackathon.]`
-* `[Acknowledge team contributions and tools used.]`
+* **Qiskit:** https://qiskit.org/
+* **Qiskit Aer:** https://github.com/Qiskit/qiskit-aer
+* **Streamlit documentation:** https://docs.streamlit.io/
+* **NumPy documentation:** https://numpy.org/doc/
+* **Matplotlib documentation:** https://matplotlib.org/stable/
+* **Hackathon template:** https://github.com/Shanwis/Qiskit-Fall-Fest-2026-IIITKottayam-Hackathon-Template
+
+**Acknowledgments:** This project was developed for Qiskit Fall Fest 2026, Track 1: Quantum Games & Interactive Puzzles. AI assistance was used during development; the project author is responsible for reviewing, understanding, testing, and presenting the implementation. Any additional resources or collaborators used in the final project should be acknowledged here.
